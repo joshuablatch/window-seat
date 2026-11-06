@@ -1,5 +1,5 @@
-import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=7';
-import * as spotify from './spotify.js?v=7';
+import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=8';
+import * as spotify from './spotify.js?v=8';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
