@@ -1,5 +1,5 @@
-import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=10';
-import * as spotify from './spotify.js?v=10';
+import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=11';
+import * as spotify from './spotify.js?v=11';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
@@ -44,13 +44,43 @@ const debugBox = document.createElement('pre');
 debugBox.style.cssText = 'position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top,0px) + 4px);margin:0;padding:8px;font:11px/1.35 ui-monospace,monospace;background:rgba(0,0,0,.75);color:#fff;border-radius:8px;z-index:99;pointer-events:none;white-space:pre-wrap;display:none';
 const debugDot = document.createElement('div');
 debugDot.style.cssText = 'position:fixed;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#ff3b30;z-index:99;pointer-events:none;display:none';
-document.body.append(debugBox, debugDot);
+// Height bars: where each idea of "full height" puts the bottom of the screen.
+// Green 100lvh, blue 100dvh, orange 100svh, red the app itself, pink screen.height.
+const bars = [['100lvh', '#34c759'], ['100dvh', '#0a84ff'], ['100svh', '#ff9f0a'], ['var(--app-h,100%)', '#ff3b30']]
+  .map(([h, c], i) => {
+    const b = document.createElement('div');
+    b.style.cssText = `position:fixed;top:0;left:${i * 20}%;width:20%;height:${h};box-sizing:border-box;border-bottom:8px solid ${c};z-index:98;pointer-events:none;display:none`;
+    return b;
+  });
+const screenBar = document.createElement('div');
+screenBar.style.cssText = 'position:fixed;left:80%;width:20%;height:8px;background:#ff2d92;z-index:98;pointer-events:none;display:none';
+document.body.append(debugBox, debugDot, ...bars, screenBar);
+function screenReport() {
+  const px = (h) => {
+    const p = document.createElement('div');
+    p.style.cssText = `position:fixed;top:0;height:${h};width:0;visibility:hidden`;
+    document.body.append(p);
+    const v = p.offsetHeight; p.remove(); return v;
+  };
+  const vv = window.visualViewport || {};
+  const ios = (navigator.userAgent.match(/OS (\d+[_\d]*)/) || [])[1] || '?';
+  return `SCREEN REPORT  iOS ${ios.replace(/_/g, '.')}  dpr ${devicePixelRatio}\n` +
+    `standalone ${Boolean(navigator.standalone)}  display ${matchMedia('(display-mode: standalone)').matches ? 'standalone' : 'browser'}\n` +
+    `bar meta ${document.querySelector('meta[name="apple-mobile-web-app-status-bar-style"]').content}\n` +
+    `inner ${innerWidth}x${innerHeight}  screen ${screen.width}x${screen.height}\n` +
+    `client ${document.documentElement.clientHeight}  vv ${Math.round(vv.height)} top ${Math.round(vv.offsetTop)}\n` +
+    `lvh ${px('100lvh')}  dvh ${px('100dvh')}  svh ${px('100svh')}  app ${Math.round($('app').getBoundingClientRect().bottom)}\n` +
+    `inset top ${px('env(safe-area-inset-top,0px)')}  bottom ${px('env(safe-area-inset-bottom,0px)')}\n` +
+    `bars: green lvh, blue dvh, orange svh, red app, pink screen`;
+}
 addEventListener('pointerdown', (e) => {
   clearTimeout(holdTimer);
   holdTimer = setTimeout(() => {
     debugOn = !debugOn;
     debugBox.style.display = debugDot.style.display = debugOn ? 'block' : 'none';
-    debugBox.textContent = debugOn ? 'Touch debug on. Tap the buttons, then screenshot.' : '';
+    [...bars, screenBar].forEach((b) => { b.style.display = debugOn ? 'block' : 'none'; });
+    screenBar.style.top = `${screen.height - 8}px`;
+    debugBox.textContent = debugOn ? screenReport() : '';
   }, 1500);
   if (!debugOn) return;
   const t = e.target;

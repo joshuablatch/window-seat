@@ -1,7 +1,7 @@
 // Spotify: sign in with PKCE (no server, no secret), read what's playing,
 // and send play / pause / next / previous. Controls need Spotify Premium.
 
-import { SPOTIFY_CLIENT_ID } from './config.js?v=10';
+import { SPOTIFY_CLIENT_ID } from './config.js?v=11';
 
 const SCOPES = 'user-read-currently-playing user-read-playback-state user-modify-playback-state';
 const STORE = 'ws.spotify';
