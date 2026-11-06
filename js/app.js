@@ -1,5 +1,5 @@
-import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=5';
-import * as spotify from './spotify.js?v=5';
+import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=6';
+import * as spotify from './spotify.js?v=6';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
@@ -85,7 +85,7 @@ function applyTheme() {
 const strips = [];
 let phase = 0;        // 0..1 through one loop of the strip
 let speed = 0;        // px per second, eased
-const CRUISE = 16;    // px per second at full speed
+const CRUISE = 42;    // px per second at full speed
 
 function showScene() {
   const el = document.createElement('div');
@@ -154,10 +154,10 @@ function pole() {
     const w = view.clientWidth;
     p.animate(
       [{ transform: `translateX(${w + 30}px)` }, { transform: 'translateX(-60px)' }],
-      { duration: 420, easing: 'linear' }
+      { duration: 340, easing: 'linear' }
     ).onfinish = () => p.remove();
   }
-  setTimeout(pole, 4000 + Math.random() * 5000);
+  setTimeout(pole, 2500 + Math.random() * 4000);
 }
 
 // ---------- Controls visibility ----------

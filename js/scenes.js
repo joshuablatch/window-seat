@@ -22,7 +22,10 @@ export const STYLES = {
   },
 };
 
-export const CITIES = ['Chicago', 'Tokyo', 'Paris', 'Lisbon', 'Kyoto', 'Amsterdam'];
+// Bump when scene images change so phones fetch the new art.
+const ART_VERSION = 2;
+
+export const CITIES =['Chicago', 'Tokyo', 'Paris', 'Lisbon', 'Kyoto', 'Amsterdam'];
 export const SEASONS = ['Spring', 'Summer', 'Autumn', 'Winter'];
 
 const AVAILABLE = [
@@ -41,7 +44,7 @@ const key = (style, city, season) => `${style}-${city}-${season}`.toLowerCase();
 const index = new Set(AVAILABLE.map((a) => key(...a)));
 
 export function sceneUrl(style, city, season) {
-  return `scenes/${key(style, city, season)}.jpg`;
+  return `scenes/${key(style, city, season)}.jpg?v=${ART_VERSION}`;
 }
 
 export function hasScene(style, city, season) {
