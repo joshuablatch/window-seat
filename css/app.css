@@ -74,10 +74,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
 
 /* ---- Info row ---- */
 .info {
-  position: absolute; left: 28px; right: 28px; bottom: calc(var(--bot) + 88px); height: 38px;
+  position: absolute; left: 28px; right: 28px; bottom: calc(var(--bot) + 54px); height: 38px;
   display: flex; justify-content: space-between; align-items: center; gap: 16px;
-  transition: bottom .7s var(--ease);
+  transition: bottom .5s var(--ease);
 }
+/* Controls hidden: the city and song sit low. Shown: they lift to make room. */
+.app.show-controls .info { bottom: calc(var(--bot) + 88px); }
 .city {
   display: flex; align-items: center; gap: 6px; padding: 0; border: 0; background: none;
   font-family: 'Instrument Serif', Georgia, serif; font-size: 30px; line-height: 1;
@@ -117,7 +119,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .app.show-controls .progress { opacity: 1; }
 
 .hint {
-  position: absolute; left: 0; right: 0; bottom: calc(var(--bot) + 22px); margin: 0;
+  position: absolute; left: 0; right: 0; bottom: calc(var(--bot) + 20px); margin: 0;
   text-align: center; font-size: 11px; color: var(--muted); pointer-events: none;
   transition: opacity .6s var(--ease);
 }
@@ -130,12 +132,15 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .toast.on { opacity: 1; }
 
 /* ---- Full screen ---- */
-.app[data-mode="full"] .window { left: 4px; right: 3px; top: 2px; bottom: 2px; }
+/* Kept inside the status bar and home bar so the rounded frame sits within
+   the phone's own corners. */
+.app[data-mode="full"] .window { left: 10px; right: 10px; top: calc(var(--top) + 4px); bottom: calc(var(--bot) + 4px); }
 .app[data-mode="full"] .fade { opacity: 1; }
 .app[data-mode="full"] .ledge { opacity: 0; }
-.app[data-mode="full"] .info { bottom: calc(var(--bot) + 98px); }
-.app[data-mode="full"] .controls { bottom: calc(var(--bot) + 30px); }
-.app[data-mode="full"] .hint { bottom: calc(var(--bot) + 40px); }
+.app[data-mode="full"] .info { bottom: calc(var(--bot) + 46px); }
+.app[data-mode="full"].show-controls .info { bottom: calc(var(--bot) + 100px); }
+.app[data-mode="full"] .controls { bottom: calc(var(--bot) + 34px); }
+.app[data-mode="full"] .hint { bottom: calc(var(--bot) + 28px); }
 .app[data-mode="full"] .toast { bottom: calc(var(--bot) + 150px); }
 
 /* ---- Picker sheet ---- */
