@@ -1,5 +1,5 @@
-import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=3';
-import * as spotify from './spotify.js?v=3';
+import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=4';
+import * as spotify from './spotify.js?v=4';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
@@ -24,10 +24,46 @@ function fitScreen() {
   const portrait = innerHeight > innerWidth;
   const h = standalone && portrait ? Math.max(innerHeight, screen.height) : innerHeight;
   document.documentElement.style.setProperty('--app-h', `${h}px`);
+  // The page must never scroll, or iOS taps land off from what's drawn.
+  if (scrollX || scrollY) scrollTo(0, 0);
 }
 fitScreen();
 addEventListener('resize', fitScreen);
+addEventListener('scroll', () => scrollTo(0, 0));
 addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
+
+// ---------- Touch debug (hold a finger still for 1.5 s to toggle) ----------
+let debugOn = false;
+let holdTimer = 0;
+const debugBox = document.createElement('pre');
+debugBox.style.cssText = 'position:fixed;left:8px;right:8px;top:calc(env(safe-area-inset-top,0px) + 4px);margin:0;padding:8px;font:11px/1.35 ui-monospace,monospace;background:rgba(0,0,0,.75);color:#fff;border-radius:8px;z-index:99;pointer-events:none;white-space:pre-wrap;display:none';
+const debugDot = document.createElement('div');
+debugDot.style.cssText = 'position:fixed;width:14px;height:14px;margin:-7px 0 0 -7px;border-radius:50%;background:#ff3b30;z-index:99;pointer-events:none;display:none';
+document.body.append(debugBox, debugDot);
+addEventListener('pointerdown', (e) => {
+  clearTimeout(holdTimer);
+  holdTimer = setTimeout(() => {
+    debugOn = !debugOn;
+    debugBox.style.display = debugDot.style.display = debugOn ? 'block' : 'none';
+    debugBox.textContent = debugOn ? 'Touch debug on. Tap the buttons, then screenshot.' : '';
+  }, 1500);
+  if (!debugOn) return;
+  const t = e.target;
+  const vv = window.visualViewport || {};
+  debugDot.style.left = `${e.clientX}px`;
+  debugDot.style.top = `${e.clientY}px`;
+  debugBox.textContent =
+    `tap ${Math.round(e.clientX)},${Math.round(e.clientY)} -> ${t.tagName.toLowerCase()}${t.id ? '#' + t.id : ''}${t.className && typeof t.className === 'string' ? '.' + t.className.split(' ').join('.') : ''}\n` +
+    `button: ${t.closest('button')?.id || t.closest('button')?.getAttribute('aria-label') || 'none'}\n` +
+    `inner ${innerWidth}x${innerHeight}  screen ${screen.width}x${screen.height}\n` +
+    `vv ${Math.round(vv.width)}x${Math.round(vv.height)} top ${Math.round(vv.offsetTop)}  scroll ${scrollX},${scrollY}\n` +
+    `app-h ${getComputedStyle(document.documentElement).getPropertyValue('--app-h')}  standalone ${Boolean(navigator.standalone)}`;
+}, { capture: true });
+addEventListener('pointerup', () => clearTimeout(holdTimer), { capture: true });
+addEventListener('pointercancel', () => clearTimeout(holdTimer), { capture: true });
+addEventListener('click', (e) => {
+  if (debugOn) debugBox.textContent += `\nclick -> ${e.target.closest('button')?.id || e.target.tagName.toLowerCase()}`;
+}, { capture: true });
 
 // ---------- Theme ----------
 function applyTheme() {

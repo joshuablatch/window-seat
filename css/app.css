@@ -8,7 +8,7 @@
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 [hidden] { display: none !important; }
-html, body { margin: 0; height: var(--app-h, 100%); overflow: hidden; background: var(--wall); }
+html, body { margin: 0; height: 100%; overflow: hidden; background: var(--wall); }
 body {
   color: var(--text); font-family: Inter, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased; -webkit-user-select: none; user-select: none;
