@@ -1,7 +1,7 @@
 // Spotify: sign in with PKCE (no server, no secret), read what's playing,
 // and send play / pause / next / previous. Controls need Spotify Premium.
 
-import { SPOTIFY_CLIENT_ID } from './config.js';
+import { SPOTIFY_CLIENT_ID } from './config.js?v=3';
 
 const SCOPES = 'user-read-currently-playing user-read-playback-state user-modify-playback-state';
 const STORE = 'ws.spotify';
@@ -50,7 +50,17 @@ async function tokenRequest(body) {
     headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
     body: new URLSearchParams({ client_id: SPOTIFY_CLIENT_ID, ...body }),
   });
-  if (!res.ok) throw new Error(`token ${res.status}`);
+  if (!res.ok) {
+    // A refresh Spotify won't accept means the sign-in is dead: drop it so
+    // the app offers Connect Spotify again.
+    if (body.grant_type === 'refresh_token' && res.status === 400) {
+      disconnect();
+      throw new Error('Spotify sign-in expired. Tap Connect Spotify');
+    }
+    let msg = '';
+    try { msg = (await res.json()).error_description || ''; } catch {}
+    throw new Error(`Spotify sign-in failed${msg ? `: ${msg}` : ` (${res.status})`}`);
+  }
   const t = await res.json();
   tokens = {
     access: t.access_token,
@@ -94,10 +104,23 @@ async function api(path, method = 'GET') {
   return res;
 }
 
-// What's playing right now, or null.
+// A short, plain reason for a failed Spotify call.
+async function reason(res) {
+  let msg = '';
+  try { msg = (await res.json()).error?.message || ''; } catch {}
+  if (/not registered|developer dashboard/i.test(msg)) return 'Add your email in the Spotify dashboard (User Management)';
+  if (/premium/i.test(msg)) return 'Controls need Spotify Premium';
+  if (res.status === 404) return 'Open Spotify and start a song first';
+  if (res.status === 401) return 'Spotify sign-in expired. Disconnect and connect again';
+  if (res.status === 429) return 'Spotify says slow down. Try again in a minute';
+  return `Spotify error ${res.status}${msg ? `: ${msg}` : ''}`;
+}
+
+// What's playing right now, or null. Throws an Error with a plain reason.
 export async function nowPlaying() {
   const res = await api('/me/player/currently-playing');
-  if (res.status !== 200) return null;
+  if (res.status === 204 || res.status === 0) return null;
+  if (res.status !== 200) throw new Error(await reason(res));
   const d = await res.json();
   const item = d.item;
   if (!item) return null;
@@ -116,11 +139,13 @@ export async function nowPlaying() {
 
 // Returns '' on success, or a short reason to show.
 async function control(path, method) {
-  const res = await api(path, method);
-  if (res.ok || res.status === 204) return '';
-  if (res.status === 404) return 'Open Spotify and start a song first';
-  if (res.status === 403) return 'Controls need Spotify Premium';
-  return 'Spotify didn’t respond';
+  try {
+    const res = await api(path, method);
+    if (res.ok || res.status === 204) return '';
+    return await reason(res);
+  } catch (e) {
+    return `Couldn’t reach Spotify (${e.message || 'network'})`;
+  }
 }
 
 export const play = () => control('/me/player/play', 'PUT');

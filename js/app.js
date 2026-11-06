@@ -1,5 +1,5 @@
-import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js';
-import * as spotify from './spotify.js';
+import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=3';
+import * as spotify from './spotify.js?v=3';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
@@ -223,19 +223,26 @@ function drawProgress() {
 
 async function poll() {
   if (!spotify.isConnected() || document.hidden) return;
+  const idle = $('idle');
   try {
     const prev = track;
     track = await spotify.nowPlaying();
+    idle.textContent = 'Nothing playing';
     renderTrack(prev);
-  } catch {
-    // Network blip: keep what we had.
+  } catch (e) {
+    // Keep what we had, and say why Spotify isn't answering.
+    idle.textContent = e.message || 'Spotify isn’t answering';
+    if (e.message && e.message !== poll.lastError) toast(e.message);
+    poll.lastError = e.message;
+    if (!spotify.isConnected()) { track = null; renderTrack(null); }
   }
 }
 setInterval(poll, 5000);
 
 async function doControl(fn) {
   showControls();
-  const err = await fn();
+  let err = '';
+  try { err = await fn(); } catch (e) { err = e.message || 'Spotify didn’t respond'; }
   if (err) toast(err);
   setTimeout(poll, 450);
 }
@@ -344,7 +351,7 @@ document.addEventListener('visibilitychange', () => {
 
 // ---------- Start ----------
 (async () => {
-  try { await spotify.handleRedirect(); } catch { toast('Spotify sign-in didn’t finish. Try again.'); }
+  try { await spotify.handleRedirect(); } catch (e) { toast(e.message || 'Spotify sign-in didn’t finish. Try again.'); }
   applyTheme();
   setMode(ride.mode);
   showScene();
