@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<title>Window Seat</title>
+<meta name="theme-color" content="#EFE8DA">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Window Seat">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/icon-180.png">
+<link rel="icon" type="image/png" href="icons/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Serif&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<main class="app" id="app" data-mode="windowed">
+  <div class="window" id="window">
+    <div class="glass">
+      <div class="view" id="view"></div>
+      <div class="sash" aria-hidden="true"></div>
+      <div class="latch" aria-hidden="true"></div>
+      <div class="glare" aria-hidden="true"></div>
+      <div class="fade" aria-hidden="true"></div>
+    </div>
+  </div>
+
+  <div class="ledge" aria-hidden="true"><div class="progress" id="progress"></div></div>
+
+  <section class="info">
+    <button type="button" class="city" id="cityBtn" aria-label="Change city, season or style">
+      <span id="cityName">Chicago</span>
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3.5 5.5 7 9l3.5-3.5"/></svg>
+    </button>
+    <div class="track" id="track" hidden>
+      <div class="track-text">
+        <span class="track-title" id="trackTitle"></span>
+        <span class="track-artist" id="trackArtist"></span>
+      </div>
+      <img class="track-art" id="trackArt" alt="" width="38" height="38">
+    </div>
+    <button type="button" class="connect" id="connectBtn" hidden>Connect Spotify</button>
+    <span class="idle" id="idle" hidden>Nothing playing</span>
+  </section>
+
+  <div class="controls" id="controls">
+    <button type="button" class="ctl" id="prevBtn" aria-label="Previous song">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4v14"/><path d="M17 4 8 11l9 7z"/></svg>
+    </button>
+    <button type="button" class="ctl ctl-main" id="playBtn" aria-label="Pause">
+      <svg class="i-pause" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true"><path d="M6 3.5v11"/><path d="M12 3.5v11"/></svg>
+      <svg class="i-play" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M6 3.5 14 9l-8 5.5z"/></svg>
+    </button>
+    <button type="button" class="ctl" id="nextBtn" aria-label="Next song">
+      <svg width="22" height="22" viewBox="0 0 22 22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 4v14"/><path d="M5 4l9 7-9 7z"/></svg>
+    </button>
+    <button type="button" class="ctl ctl-size" id="sizeBtn" aria-label="Full screen">
+      <svg class="i-grow" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 7V2h5"/><path d="M16 7V2h-5"/><path d="M2 11v5h5"/><path d="M16 11v5h-5"/></svg>
+      <svg class="i-shrink" width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 2v5H2"/><path d="M11 2v5h5"/><path d="M7 16v-5H2"/><path d="M11 16v-5h5"/></svg>
+    </button>
+  </div>
+
+  <p class="hint" id="hint">Tap anywhere for controls</p>
+  <p class="toast" id="toast" role="status"></p>
+</main>
+
+<div class="backdrop" id="backdrop"></div>
+<section class="sheet" id="sheet" aria-label="Choose a ride" aria-hidden="true">
+  <div class="grab" aria-hidden="true"></div>
+  <div class="sheet-head">
+    <h2>Where to?</h2>
+    <span id="summary"></span>
+  </div>
+  <div class="group">
+    <span class="label">City</span>
+    <div class="cities" id="cities"></div>
+  </div>
+  <div class="group">
+    <span class="label">Season</span>
+    <div class="seasons" id="seasons"></div>
+  </div>
+  <div class="group">
+    <span class="label">Drawn in</span>
+    <div class="styles" id="styles"></div>
+  </div>
+  <button type="button" class="ride" id="rideBtn">Ride</button>
+  <button type="button" class="signout" id="signoutBtn" hidden>Disconnect Spotify</button>
+</section>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
