@@ -1,5 +1,5 @@
-import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=6';
-import * as spotify from './spotify.js?v=6';
+import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=7';
+import * as spotify from './spotify.js?v=7';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
@@ -17,13 +17,22 @@ let ride = { style: 'pencil', city: 'Chicago', season: 'Autumn', mode: 'windowed
 Object.assign(ride, nearestScene(ride));
 
 // ---------- Fill the whole screen ----------
-// Opened from the home screen, iOS reports a viewport shorter than the screen
-// (by about the status bar), so size the app to the real screen height.
+// Opened from the home screen, iOS sometimes reports a viewport shorter than
+// the screen (by about the status bar) while the page really runs under the
+// status bar. Only then size the app to the screen; when the page starts below
+// the status bar (no top inset), the reported height is the true one, and
+// using the screen height would push the bottom off.
+const insetProbe = document.createElement('div');
+insetProbe.style.cssText = 'position:fixed;top:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden;pointer-events:none';
+document.body.append(insetProbe);
 function fitScreen() {
   const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
   const portrait = innerHeight > innerWidth;
-  const h = standalone && portrait ? Math.max(innerHeight, screen.height) : innerHeight;
-  document.documentElement.style.setProperty('--app-h', `${h}px`);
+  const underStatusBar = insetProbe.offsetHeight > 0;
+  const h = standalone && portrait && underStatusBar
+    ? Math.min(screen.height, innerHeight + insetProbe.offsetHeight)
+    : innerHeight;
+  document.documentElement.style.setProperty('--app-h', `${Math.max(h, innerHeight)}px`);
   // The page must never scroll, or iOS taps land off from what's drawn.
   if (scrollX || scrollY) scrollTo(0, 0);
 }
@@ -31,6 +40,9 @@ fitScreen();
 addEventListener('resize', fitScreen);
 addEventListener('scroll', () => scrollTo(0, 0));
 addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
+// iOS can change the viewport while the app sits in the background.
+addEventListener('pageshow', fitScreen);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) setTimeout(fitScreen, 200); });
 
 // ---------- Touch debug (hold a finger still for 1.5 s to toggle) ----------
 let debugOn = false;
@@ -57,7 +69,7 @@ addEventListener('pointerdown', (e) => {
     `button: ${t.closest('button')?.id || t.closest('button')?.getAttribute('aria-label') || 'none'}\n` +
     `inner ${innerWidth}x${innerHeight}  screen ${screen.width}x${screen.height}\n` +
     `vv ${Math.round(vv.width)}x${Math.round(vv.height)} top ${Math.round(vv.offsetTop)}  scroll ${scrollX},${scrollY}\n` +
-    `app-h ${getComputedStyle(document.documentElement).getPropertyValue('--app-h')}  standalone ${Boolean(navigator.standalone)}`;
+    `app-h ${getComputedStyle(document.documentElement).getPropertyValue('--app-h')}  inset-top ${insetProbe.offsetHeight}  standalone ${Boolean(navigator.standalone)}`;
 }, { capture: true });
 addEventListener('pointerup', () => clearTimeout(holdTimer), { capture: true });
 addEventListener('pointercancel', () => clearTimeout(holdTimer), { capture: true });

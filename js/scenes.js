@@ -23,7 +23,7 @@ export const STYLES = {
 };
 
 // Bump when scene images change so phones fetch the new art.
-const ART_VERSION = 2;
+const ART_VERSION = 3;
 
 export const CITIES =['Chicago', 'Tokyo', 'Paris', 'Lisbon', 'Kyoto', 'Amsterdam'];
 export const SEASONS = ['Spring', 'Summer', 'Autumn', 'Winter'];
