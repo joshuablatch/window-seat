@@ -1,5 +1,5 @@
-import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=9';
-import * as spotify from './spotify.js?v=9';
+import { STYLES, CITIES, SEASONS, sceneUrl, hasScene, cityThumb, nearestScene } from './scenes.js?v=10';
+import * as spotify from './spotify.js?v=10';
 
 const $ = (id) => document.getElementById(id);
 const app = $('app');
@@ -17,17 +17,13 @@ let ride = { style: 'pencil', city: 'Chicago', season: 'Autumn', mode: 'windowed
 Object.assign(ride, nearestScene(ride));
 
 // ---------- Fill the whole screen ----------
-// Opened from the home screen, the page runs under the status bar
-// (black-translucent), but iOS reports a viewport one status bar short, which
-// cut the bottom off. Home-screen portrait: always size to the full screen.
+// The status bar is opaque (see index.html), so the viewport iOS reports is
+// the real one: size the app to it, never to the screen.
 const insetProbe = document.createElement('div');
 insetProbe.style.cssText = 'position:fixed;top:0;height:env(safe-area-inset-top,0px);width:0;visibility:hidden;pointer-events:none';
 document.body.append(insetProbe);
 function fitScreen() {
-  const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
-  const portrait = matchMedia('(orientation: portrait)').matches;
-  const h = standalone && portrait ? Math.max(innerHeight, screen.height) : innerHeight;
-  document.documentElement.style.setProperty('--app-h', `${h}px`);
+  document.documentElement.style.setProperty('--app-h', `${innerHeight}px`);
   // The page must never scroll, or iOS taps land off from what's drawn.
   if (scrollX || scrollY) scrollTo(0, 0);
 }
