@@ -16,6 +16,19 @@ const write = () => {
 let ride = { style: 'pencil', city: 'Chicago', season: 'Autumn', mode: 'windowed', ...read() };
 Object.assign(ride, nearestScene(ride));
 
+// ---------- Fill the whole screen ----------
+// Opened from the home screen, iOS reports a viewport shorter than the screen
+// (by about the status bar), so size the app to the real screen height.
+function fitScreen() {
+  const standalone = navigator.standalone || matchMedia('(display-mode: standalone)').matches;
+  const portrait = innerHeight > innerWidth;
+  const h = standalone && portrait ? Math.max(innerHeight, screen.height) : innerHeight;
+  document.documentElement.style.setProperty('--app-h', `${h}px`);
+}
+fitScreen();
+addEventListener('resize', fitScreen);
+addEventListener('orientationchange', () => setTimeout(fitScreen, 300));
+
 // ---------- Theme ----------
 function applyTheme() {
   const s = STYLES[ride.style];

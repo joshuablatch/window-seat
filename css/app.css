@@ -8,7 +8,7 @@
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 [hidden] { display: none !important; }
-html, body { margin: 0; height: 100%; overflow: hidden; background: var(--wall); }
+html, body { margin: 0; height: var(--app-h, 100%); overflow: hidden; background: var(--wall); }
 body {
   color: var(--text); font-family: Inter, system-ui, sans-serif;
   -webkit-font-smoothing: antialiased; -webkit-user-select: none; user-select: none;
@@ -17,7 +17,9 @@ body {
 }
 button { font: inherit; color: inherit; cursor: pointer; }
 
-.app { position: fixed; inset: 0; overflow: hidden; }
+/* --app-h is set from JS: a home-screen iPhone app reports a viewport one
+   status bar short, which left a gap at the bottom. */
+.app { position: fixed; top: 0; left: 0; right: 0; height: var(--app-h, 100%); overflow: hidden; }
 
 /* ---- The window ---- */
 .window {
